@@ -14,32 +14,34 @@ async function init() {
     IsInit = true;
     await updateOldSessions();
 
-    browser.tabs.onActivated.addListener(replacePage);
-    browser.windows.onFocusChanged.addListener(replacePage);
+    Browser.api.tabs.onActivated.addListener(replacePage);
+    Browser.api.windows.onFocusChanged.addListener(replacePage);
 
-    const gettingInfo = await browser.runtime.getBrowserInfo();
-    BrowserVersion = gettingInfo.version.split('.')[0];
+//    const gettingInfo = await chrome.runtime.getBrowserInfo();
+//    BrowserVersion = gettingInfo.version.split('.')[0];
+    BrowserVersion = 50;
 
     setAutoSave();
     autoSaveWhenClose().then(openLastSession);
 
-    browser.storage.onChanged.addListener(setAutoSave);
-    browser.tabs.onUpdated.addListener(onUpdate);
-    browser.tabs.onCreated.addListener(autoSaveWhenClose);
-    browser.tabs.onRemoved.addListener(autoSaveWhenClose);
-    browser.windows.onCreated.addListener(autoSaveWhenClose);
+    Browser.api.storage.onChanged.addListener(setAutoSave);
+    Browser.api.tabs.onUpdated.addListener(onUpdate);
+    Browser.api.tabs.onCreated.addListener(autoSaveWhenClose);
+    Browser.api.tabs.onRemoved.addListener(autoSaveWhenClose);
+    Browser.api.windows.onCreated.addListener(autoSaveWhenClose);
 
     backupSessions();
 }
 init();
-browser.runtime.onInstalled.addListener(onInstalledListener);
-browser.runtime.onMessage.addListener(onMessageListener);
+Browser.api.runtime.onInstalled.addListener(onInstalledListener);
+Browser.api.runtime.onMessage.addListener(onMessageListener);
 
 async function onInstalledListener(details) {
     if (details.reason != 'install' && details.reason != 'update') return;
 
     //初回起動時にオプションページを表示して設定を初期化
-    browser.tabs.create({
+//??
+    Browser.api.tabs.create({
         url: "options/options.html#information?action=updated",
         active: false
     });
@@ -68,7 +70,7 @@ async function addNewValues() {
 async function migrateSessionsFromStorage() {
     const getSessionsByStorage = () => {
         return new Promise(resolve => {
-            browser.storage.local.get('sessions', value => {
+            Browser.api.storage.local.get('sessions', value => {
                 resolve(value.sessions || []);
             });
         })
@@ -101,10 +103,10 @@ async function migrateSessionsFromStorage() {
         for (let i in sessions) {
             if (sessions[i].tag.includes('winClose')) {
                 if (sessions[i].name === 'Auto Saved - Window was closed')
-                    sessions[i].name = browser.i18n.getMessage('winCloseSessionName');
+                    sessions[i].name = Browser.api.i18n.getMessage('winCloseSessionName');
             } else if (sessions[i].tag.includes('regular')) {
                 if (sessions[i].name === 'Auto Saved - Regularly')
-                    sessions[i].name = browser.i18n.getMessage('regularSaveSessionName');
+                    sessions[i].name = Browser.api.i18n.getMessage('regularSaveSessionName');
             }
         }
     }
@@ -117,12 +119,12 @@ async function migrateSessionsFromStorage() {
         await saveSession(session);
     }
 
-    browser.storage.local.remove('sessions');
+    Browser.api.storage.local.remove('sessions');
     return Promise.resolve;
 }
 
 
-async function onMessageListener(request, sender, sendResponse) {
+function onMessageListener(request, sender, sendResponse) {
     switch (request.message) {
         case "save":
             saveSession(request.session);
@@ -151,7 +153,15 @@ async function onMessageListener(request, sender, sendResponse) {
             deleteAllSessions();
             break;
         case "getSessions":
-            return getSessions(request, sender, sendResponse);
+//??
+//            return getSessions(request, sender, sendResponse);
+/***/
+            getSessions(request, sender, sendResponse).then((sessions) => {
+                var q = sessions;
+                sendResponse(sessions)
+              });
+            return true;
+/***/
             break;
         case "addTag":
             addTag(request.id, request.tag);
@@ -160,11 +170,19 @@ async function onMessageListener(request, sender, sendResponse) {
             removeTag(request.id, request.tag);
             break;
         case "getInitState":
-            return IsInit;
+//??
+//            return IsInit;
+            sendResponse(IsInit);
             break;
         case "getCurrentSession":
-            const currentSession = await loadCurrentSesssion('', [], request.property).catch(() => {});
-            return currentSession;
+//??            const currentSession = await loadCurrentSesssion('', [], request.property).catch(() => {});
+            loadCurrentSesssion('', [], request.property).catch(() => {})
+            .then((currentSession) => {
+               sendResponse(currentSession);
+            });
+            return true;
+//??
+//            return currentSession;
     }
 }
 

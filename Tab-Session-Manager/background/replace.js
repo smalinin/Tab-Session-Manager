@@ -5,7 +5,7 @@
 
 function returnReplaceParameter(url) {
     let parameter = {};
-    if (url.indexOf(browser.runtime.getURL("replaced/replaced.html")) === 0) {
+    if (url.indexOf(Browser.api.runtime.getURL("replaced/replaced.html")) === 0) {
         parameter.isReplaced = true;
         let paras = url.split('?')[1].split('&');
         for (let p of paras) {
@@ -42,7 +42,7 @@ function returnReplaceURL(state, title, url, favIconUrl) {
 async function replacePage() {
     if (IsOpeningSession) return;
 
-    const info = await browser.tabs.query({
+    const info = await Browser.api.tabs.query({
         active: true,
         currentWindow: true
     });
@@ -60,25 +60,29 @@ async function replacePage() {
         updateProperties.url = parameter.url;
         if (BrowserVersion >= 57) updateProperties.loadReplace = true;
 
-        browser.tabs.update(info[0].id, updateProperties).then(() => {
+//??
+        Browser.api.tabs.update(info[0].id, updateProperties).then(() => {
             if (parameter.openInReaderMode == "true") {
                 toggleReaderMode(info[0].id);
             }
         }).catch(() => {
             updateProperties.url = returnReplaceURL('open_faild', parameter.title, parameter.url, parameter.favIconUrl);
-            browser.tabs.update(info[0].id, updateProperties);
+//??
+            Browser.api.tabs.update(info[0].id, updateProperties);
         })
     }
 }
 
 function toggleReaderMode(id) {
-    browser.tabs.get(id).then((info) => {
+//??
+    Browser.api.tabs.get(id).then((info) => {
         if (info.status != 'complete') {
             setTimeout(() => {
                 toggleReaderMode(id);
             }, 500);
             return;
         }
-        if (info.isArticle) browser.tabs.toggleReaderMode(id);
+//??
+        if (info.isArticle) Browser.api.tabs.toggleReaderMode(id);
     })
 }

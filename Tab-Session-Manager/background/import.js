@@ -46,7 +46,8 @@ async function backupSessions() {
     const backupFolder = S.get().backupFolder;
     const fileName = returnFileName(sessions);
 
-    await browser.downloads.download({
+//??
+    await Browser.api.downloads.download({
         url: downloadUrl,
         filename: `${backupFolder}${backupFolder==''? '':'/'}${fileName}.json`,
         conflictAction: 'uniquify',
@@ -57,8 +58,8 @@ async function backupSessions() {
 }
 
 function returnFileName(sessions) {
-    const sessionLabel = browser.i18n.getMessage('sessionLabel').toLowerCase();
-    const sessionsLabel = browser.i18n.getMessage('sessionsLabel').toLowerCase();
+    const sessionLabel = Browser.api.i18n.getMessage('sessionLabel').toLowerCase();
+    const sessionsLabel = Browser.api.i18n.getMessage('sessionsLabel').toLowerCase();
 
     let fileName = `${moment().format(S.get().dateFormat)} (${sessions.length} ${(sessions.length==1)?sessionLabel : sessionsLabel})`;
 
@@ -68,9 +69,10 @@ function returnFileName(sessions) {
 }
 
 async function removeBackupFile() {
-    const backupItems = await browser.downloads.search({
+//??
+    const backupItems = await Browser.api.downloads.search({
         filenameRegex: `^.*${S.get().backupFolder}.*$`,
-        urlRegex: `^blob\.${browser.runtime.getURL('')}.*$`,
+        urlRegex: `^blob\.${Browser.api.runtime.getURL('')}.*$`,
         orderBy: ['-startTime'],
         exists: true
     });
@@ -81,8 +83,10 @@ async function removeBackupFile() {
     for (let i of backupItems) {
         count++;
         if (count < limit) continue;
-        await browser.downloads.removeFile(i.id).catch(() => {});
-        await browser.downloads.erase({
+//??
+        await Browser.api.downloads.removeFile(i.id).catch(() => {});
+//??
+        await Browser.api.downloads.erase({
             id: i.id
         }).catch(() => {});
     }

@@ -22,7 +22,7 @@ document.getElementsByClassName("replacedUrl")[0].innerText = parameter.url;
 document.head.insertAdjacentHTML('beforeend', `<link rel="shortcut icon" href="${sanitaize.encode(parameter.favIconUrl)}">`);
 
 if (parameter.state == "open_faild") {
-    document.getElementsByClassName("replacedPageMessage")[0].innerText = browser.i18n.getMessage("replacedPageMessage");
+    document.getElementsByClassName("replacedPageMessage")[0].innerText = Browser.api.i18n.getMessage("replacedPageMessage");
 }
 
 function returnReplaceParameter(url) {

@@ -57,9 +57,9 @@ function replaceInvalidValue(elementId) {
 }
 
 function removeSessions() {
-    let res = confirm(browser.i18n.getMessage("warningRemoveAllMessage"));
+    let res = confirm(Browser.api.i18n.getMessage("warningRemoveAllMessage"));
     if (res == true) {
-        browser.runtime.sendMessage({
+        Browser.api.runtime.sendMessage({
             message: "deleteAllSessions"
         });
     }
@@ -213,11 +213,11 @@ function parseOldSession(file) {
 
 function importSave() {
     if (ImportSessions.length != undefined) {
-        browser.runtime.sendMessage({
+        Browser.api.runtime.sendMessage({
             message: "import",
             importSessions: ImportSessions
         });
-        alert(browser.i18n.getMessage("importMessage"));
+        alert(Browser.api.i18n.getMessage("importMessage"));
     }
     ImportSessions = [];
     clearImportFile();
@@ -299,7 +299,8 @@ async function exportSessions(id = null) {
 
     const fileName = returnFileName(sessions);
 
-    await browser.downloads.download({
+//??
+    await Browser.api.downloads.download({
         url: downloadUrl,
         filename: `${fileName}.json`,
         conflictAction: 'uniquify',
@@ -309,7 +310,7 @@ async function exportSessions(id = null) {
 
 async function getSessions(id) {
     return new Promise(async resolve => {
-        const sessions = await browser.runtime.sendMessage({
+        const sessions = await Browser.api.runtime.sendMessage({
             message: "getSessions",
             id: id
         });
@@ -322,7 +323,7 @@ function returnFileName(sessions) {
     if (sessions.length == 1) {
         fileName = `${sessions[0].name} - ${moment(sessions[0].date).format(S.get().dateFormat)}`;
     } else {
-        const sessionsLabel = browser.i18n.getMessage('sessionsLabel');
+        const sessionsLabel = Browser.api.i18n.getMessage('sessionsLabel');
         fileName = `${sessionsLabel} - ${moment().format(S.get().dateFormat)}`;
     }
     const pattern = /\\|\/|\:|\?|\.|"|<|>|\|/g;

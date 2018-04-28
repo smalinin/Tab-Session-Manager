@@ -103,12 +103,12 @@ function settingsObj() {};
             for (let i of items) {
                 let label;
                 if (i.id != undefined && i.id.includes("Label")) {
-                    label = browser.i18n.getMessage(i.id);
+                    label = Browser.api.i18n.getMessage(i.id);
                 } else if (i.className != undefined && i.className.includes("Label")) {
                     const labelList = i.className.split(' ').filter((element, index, array) => {
                         return element.includes("Label");
                     });
-                    label = browser.i18n.getMessage(labelList[0]);
+                    label = Browser.api.i18n.getMessage(labelList[0]);
                 } else {
                     continue;
                 }
@@ -137,7 +137,7 @@ function settingsObj() {};
     //Retrieve the Settings item from storage and overwrite Settings that do not exist
     function overRideSettingsByStorage() {
         return new Promise(function (resolve, reject) {
-            browser.storage.local.get("Settings", function (value) {
+            Browser.api.storage.local.get("Settings", function (value) {
 
                 for (let i in Settings) {
                     if (value.Settings != undefined && value.Settings[i] != undefined) {
@@ -257,7 +257,7 @@ function settingsObj() {};
     }
 
     //ストレージが変更されたらget
-    browser.storage.onChanged.addListener(changedSettings);
+    Browser.api.storage.onChanged.addListener(changedSettings);
 
     function changedSettings(changes, area) {
         if (Object.keys(changes).includes("Settings")) {
@@ -267,7 +267,7 @@ function settingsObj() {};
 
     function getSettings() {
         return new Promise(function (resolve, reject) {
-            browser.storage.local.get("Settings", function (value) {
+            Browser.api.storage.local.get("Settings", function (value) {
                 Settings = value.Settings;
                 resolve(Settings);
             });
@@ -276,9 +276,9 @@ function settingsObj() {};
 
     function saveSettings() {
         return new Promise(function (resolve, reject) {
-            browser.storage.local.set({
+            Browser.api.storage.local.set({
                 'Settings': Settings
-            }).then(function () {
+            }, function () {
                 resolve(Settings);
             });
         })

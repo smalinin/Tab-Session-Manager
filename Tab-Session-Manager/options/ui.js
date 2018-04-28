@@ -83,10 +83,10 @@ function showImportFile(fileName, sessions) {
 }
 
 function returnFileListNode(fileName, sessions) {
-    const sessionLabel = browser.i18n.getMessage("sessionLabel").toLowerCase();
-    const sessionsLabel = browser.i18n.getMessage("sessionsLabel").toLowerCase();
+    const sessionLabel = Browser.api.i18n.getMessage("sessionLabel").toLowerCase();
+    const sessionsLabel = Browser.api.i18n.getMessage("sessionsLabel").toLowerCase();
     let sessionsState;
-    if (sessions == undefined) sessionsState = browser.i18n.getMessage("readFailedMessage");
+    if (sessions == undefined) sessionsState = Browser.api.i18n.getMessage("readFailedMessage");
     else if (sessions.length <= 1) sessionsState = `${sessions.length} ${sessionLabel}`;
     else sessionsState = `${sessions.length} ${sessionsLabel}`;
 
@@ -131,11 +131,12 @@ function replaceBackupFolderName() {
 }
 
 function openDownloadFolder() {
-    browser.downloads.showDefaultFolder();
+//??
+    Browser.api.downloads.showDefaultFolder();
 }
 
 replaceBackupFolderName();
-document.getElementById('openDownloadFolder').innerText = `[${browser.i18n.getMessage("downloadFolderLabel")}]`;
-document.getElementsByClassName("amazonUrl")[0].href = browser.i18n.getMessage("amazonUrl");
-document.getElementsByClassName("addonUrl")[0].href = browser.i18n.getMessage("addonUrl");
-document.getElementsByClassName('addonVersion')[0].getElementsByClassName('caption')[0].getElementsByTagName('a')[0].innerText = `Version ${browser.runtime.getManifest().version}`;
+document.getElementById('openDownloadFolder').innerText = `[${Browser.api.i18n.getMessage("downloadFolderLabel")}]`;
+document.getElementsByClassName("amazonUrl")[0].href = Browser.api.i18n.getMessage("amazonUrl");
+document.getElementsByClassName("addonUrl")[0].href = Browser.api.i18n.getMessage("addonUrl");
+document.getElementsByClassName('addonVersion')[0].getElementsByClassName('caption')[0].getElementsByTagName('a')[0].innerText = `Version ${Browser.api.runtime.getManifest().version}`;

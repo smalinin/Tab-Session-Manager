@@ -7,7 +7,7 @@ let autoSaveTimer;
 
 function startAutoSave() {
     autoSaveTimer = setInterval(async function () {
-        let name = browser.i18n.getMessage("regularSaveSessionName");
+        let name = Browser.api.i18n.getMessage("regularSaveSessionName");
         if (S.get().useTabTitleforAutoSave) name = await getCurrentTabName();
         const tag = ['regular'];
         const property = "default";
@@ -61,7 +61,7 @@ function onUpdate(tabId, changeInfo, tab) {
 function autoSaveWhenClose() {
     return new Promise(async(resolve, reject) => {
         if (!IsOpeningSession && !IsSavingSession && (S.get().ifAutoSaveWhenClose || S.get().ifOpenLastSessionWhenStartUp)) {
-            let name = browser.i18n.getMessage("winCloseSessionName");
+            let name = Browser.api.i18n.getMessage("winCloseSessionName");
             if (S.get().useTabTitleforAutoSave) name = await getCurrentTabName();
             const tag = ['winClose', 'temp'];
             const property = "default";
@@ -100,17 +100,14 @@ async function removeOverLimit(tagState) {
 }
 
 async function getCurrentTabName() {
-    let tabs = await browser.tabs.query({
-        active: true,
-        currentWindow: true
-    });
+
+    let tabs = await Browser.api.tabs.query({ active: true, currentWindow: true})
 
     if (tabs[0] == undefined) return '';
 
     if (!S.get().ifSavePrivateWindow && tabs[0].incognito) {
-        tabs = await browser.tabs.query({
-            active: true,
-        });
+        tabs = await Browser.api.tabs.query({active: true });
+
         tabs = tabs.filter((element) => {
             return !element.incognito;
         });

@@ -61,7 +61,7 @@ async function loadCurrentSesssion(name, tag, property) {
             queryInfo.currentWindow = true;
     }
 
-    const tabs = await browser.tabs.query(queryInfo);
+    const tabs = await Browser.api.tabs.query(queryInfo);
     for (let tab of tabs) {
         //プライベートタブを無視
         if (!S.get().ifSavePrivateWindow) {
@@ -85,7 +85,7 @@ async function loadCurrentSesssion(name, tag, property) {
     session.windowsNumber = Object.keys(session.windows).length;
 
     for (let i in session.windows) {
-        const window = await browser.windows.get(parseInt(i));
+        const window = await Browser.api.windows.get(parseInt(i));
         session.windowsInfo[i] = window;
     }
 
@@ -157,7 +157,7 @@ async function showSessionWhenWindowClose(session) {
 }
 
 async function sendMessage(message, id = null) {
-    await browser.runtime.sendMessage({
+    await Browser.api.runtime.sendMessage({
         message: message,
         id: id
     }).catch(() => {});

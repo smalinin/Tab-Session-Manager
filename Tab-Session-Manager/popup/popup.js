@@ -28,9 +28,10 @@ S.init().then(async() => {
 
     const keys = ['id', 'name', 'date', 'tag', 'tabsNumber', 'windowsNumber'];
     const sessions = await getSessions(null, keys);
+
     showSessions(sessions);
 
-    browser.runtime.onMessage.addListener(changeSessions);
+    Browser.api.runtime.onMessage.addListener(changeSessions);
     document.getElementById("filter").addEventListener("change", filterChange);
     document.getElementById("sort").addEventListener("change", sortChange);
 });
@@ -39,7 +40,7 @@ async function setLabels() {
     labels = ['initialNameValue', 'inputSessionNameLabel', 'winCloseSessionName', 'regularSaveSessionName', 'categoryFilterLabel', 'sortLabel', 'displayAllLabel', 'displayUserLabel', 'displayAutoLabel', 'settingsLabel', 'open', 'remove', 'detailLabel', 'windowLabel', 'windowsLabel', 'tabLabel', 'tabsLabel', 'noSessionLabel', 'sessionDeletedLabel', 'restoreSessionLabel', 'cancelLabel', 'menuLabel', 'renameLabel', 'exportButtonLabel', 'openInNewWindowLabel', 'openInCurrentWindowLabel', 'addToCurrentWindowLabel', 'replaceCurrentSessionLabel', 'makeCopySessionLabel', 'saveOnlyCurrentWindowLabel', 'addTagLabel', 'removeTagLabel', 'donateWithPaypalLabel', "errorLabel", "indexedDBErrorLabel", "howToSolveLabel"];
 
     for (let i of labels) {
-        Labels[i] = browser.i18n.getMessage(i);
+        Labels[i] = Browser.api.i18n.getMessage(i);
     }
 
     document.getElementById('donate').title = Labels.donateWithPaypalLabel;
@@ -56,13 +57,13 @@ async function setLabels() {
 }
 
 async function getCurrentTabName() {
-    let tabs = await browser.tabs.query({
+    let tabs = await Browser.api.tabs.query({
         active: true,
         currentWindow: true
     });
 
     if (!S.get().ifSavePrivateWindow && tabs[0].incognito) {
-        tabs = await browser.tabs.query({
+        tabs = await Browser.api.tabs.query({
             active: true,
         });
 
@@ -79,7 +80,7 @@ async function getCurrentTabName() {
 }
 
 async function showIndexedDBError() {
-    const isInit = await browser.runtime.sendMessage({
+    const isInit = await Browser.api.runtime.sendMessage({
         message: "getInitState"
     });
     if (!isInit) {
@@ -96,7 +97,7 @@ async function showIndexedDBError() {
 }
 
 async function getSessions(id = null, needKeys = null) {
-    const sessions = await browser.runtime.sendMessage({
+    const sessions = await Browser.api.runtime.sendMessage({
         message: "getSessions",
         id: id,
         needKeys: needKeys
@@ -582,7 +583,7 @@ function renameSend(sessionId) {
 
     sessionName.innerText = renameInput;
 
-    browser.runtime.sendMessage({
+    Browser.api.runtime.sendMessage({
         message: "rename",
         id: sessionId,
         name: renameInput
@@ -641,7 +642,7 @@ function addTagSend(sessionId) {
     const tagInput = document.getElementById(sessionId).getElementsByClassName('addTagInput')[0];
 
     showAddTagArea(sessionId);
-    browser.runtime.sendMessage({
+    Browser.api.runtime.sendMessage({
         message: "addTag",
         id: sessionId,
         tag: tagInput.value
@@ -654,7 +655,7 @@ function removeTagSend(e) {
     const sessionId = getParentSessionId(e.target);
     const tag = e.target.parentElement.dataset.tag;
 
-    browser.runtime.sendMessage({
+    Browser.api.runtime.sendMessage({
         message: "removeTag",
         id: sessionId,
         tag: tag
@@ -691,7 +692,7 @@ class DeleteSessions {
         if (isShowRename) rename(id);
         if (isShowDetail) showDetail(id);
 
-        browser.runtime.sendMessage({
+        Browser.api.runtime.sendMessage({
             message: "remove",
             id: id,
             isSendResponce: false
@@ -702,7 +703,7 @@ class DeleteSessions {
         const session = this.deletedSessions.find((element, index, array) => {
             return element.id == id;
         })
-        browser.runtime.sendMessage({
+        Browser.api.runtime.sendMessage({
             message: "update",
             session: session,
             isSendResponce: true
@@ -776,10 +777,11 @@ function getParentSessionId(element) {
 }
 
 function openUrl(url, title = '') {
-    browser.tabs.create({
+//??
+    Browser.api.tabs.create({
         url: url
     }).catch(() => {
-        browser.tabs.create({
+        Browser.api.tabs.create({
             url: `../replaced/replaced.html?state=open_faild&title=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`
         }).catch(() => {});
     });
@@ -825,7 +827,7 @@ async function deleteWindowTab(e, target) {
 
     if (session.tabsNumber == 0) return;
 
-    browser.runtime.sendMessage({
+    Browser.api.runtime.sendMessage({
         message: 'update',
         session: session,
         isSendResponce: false
@@ -838,7 +840,7 @@ async function deleteWindowTab(e, target) {
 }
 
 async function replaceCurrentSession(id) {
-    let currentSession = await browser.runtime.sendMessage({
+    let currentSession = await Browser.api.runtime.sendMessage({
         message: 'getCurrentSession',
         property: 'default'
     });
@@ -849,7 +851,7 @@ async function replaceCurrentSession(id) {
     currentSession.name = session.name;
     currentSession.tag = session.tag;
 
-    browser.runtime.sendMessage({
+    Browser.api.runtime.sendMessage({
         message: 'update',
         session: currentSession,
         isSendResponce: true
@@ -862,7 +864,7 @@ async function makeCopySession(id) {
     session.id = UUID.generate();
     session.date = moment(session.date).add(1, 'ms').toDate();
 
-    browser.runtime.sendMessage({
+    Browser.api.runtime.sendMessage({
         message: 'save',
         session: session
     });
@@ -873,7 +875,7 @@ document.addEventListener('click', async function (e) {
     hideAllPopupMenu(e);
     switch (e.target.id) {
         case "setting":
-            browser.runtime.openOptionsPage();
+            Browser.api.runtime.openOptionsPage();
             break;
         case "saveName":
             clickSaveInput();
@@ -945,9 +947,10 @@ document.addEventListener('click', async function (e) {
             save("saveOnlyCurrentWindow");
             break;
         case "exportButton":
-            browser.runtime.onMessage.removeListener(changeSessions);
+//??
+            Browser.api.runtime.onMessage.removeListener(changeSessions);
             const sessionId = getParentSessionId(e.target);
-            browser.tabs.create({
+            Browser.api.tabs.create({
                 url: `../options/options.html#sessions?action=export&id=${sessionId}`
             });
             window.close();
@@ -987,7 +990,7 @@ async function sendOpenMessage(id, property, windowId = null) {
         }
     }
 
-    browser.runtime.sendMessage({
+    Browser.api.runtime.sendMessage({
         message: "open",
         session: openSession,
         property: property
@@ -997,7 +1000,7 @@ async function sendOpenMessage(id, property, windowId = null) {
 function save(property = "default") {
     const name = document.getElementById("saveName").value;
 
-    browser.runtime.sendMessage({
+    Browser.api.runtime.sendMessage({
         message: "saveCurrentSession",
         name: name,
         property: property
